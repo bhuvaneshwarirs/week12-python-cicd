@@ -1,5 +1,5 @@
 def get_message():
-    return "Hello! Welcome to Week 12 CI/CD Pipeline."
+    return "Hello! Welcome to Week 12 CI/CD Pipeline - Version 2."."
 
 def add_numbers(a, b):
     return a + b
