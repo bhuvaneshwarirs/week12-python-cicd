@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Downloading source code from GitHub'
                 checkout scm
             }
         }
@@ -21,6 +20,31 @@ pipeline {
         stage('Build and Test') {
             steps {
                 sh '.venv/bin/pytest -v'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=week12-python-cicd \
+                            -Dsonar.sources=. \
+                            -Dsonar.exclusions=.venv/**,.pytest_cache/**
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
     }
